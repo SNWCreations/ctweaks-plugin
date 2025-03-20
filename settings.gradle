@@ -1,3 +1,4 @@
 rootProject.name = 'SNWCTweaks-Plugin'
 
 include 'spec'
+include 'plugin'
