@@ -15,10 +15,19 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+    maven {
+        url = "https://jitpack.io/"
+    }
 }
 
+def lombok = "org.projectlombok:lombok:1.18.32"
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
+
+    implementation project(":spec")
+
+    compileOnly lombok
+    annotationProcessor lombok
 }
 
 def targetJavaVersion = 17

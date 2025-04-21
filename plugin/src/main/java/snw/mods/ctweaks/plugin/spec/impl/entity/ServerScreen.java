@@ -1,0 +1,47 @@
+package snw.mods.ctweaks.plugin.spec.impl.entity;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.UnmodifiableView;
+import snw.mods.ctweaks.entity.Screen;
+import snw.mods.ctweaks.object.pos.PlanePosition;
+import snw.mods.ctweaks.plugin.spec.impl.renderer.ServerTextRenderer;
+import snw.mods.ctweaks.protocol.packet.s2c.ClientboundAddRendererPacket;
+import snw.mods.ctweaks.protocol.packet.s2c.ClientboundClearRendererPacket;
+import snw.mods.ctweaks.render.Renderer;
+import snw.mods.ctweaks.render.TextRenderer;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import static snw.lib.protocol.util.PacketHelper.newNonce;
+
+@RequiredArgsConstructor
+public class ServerScreen implements Screen {
+    @Getter
+    private final ServerPlayer owner;
+    private final List<Renderer> renderers = new ArrayList<>();
+    private int nextTextRendererId;
+
+    @Override
+    public TextRenderer addTextRenderer(PlanePosition position) {
+        owner.ensureOnline();
+        final int newId = nextTextRendererId++;
+        final ServerTextRenderer result = new ServerTextRenderer(getOwner(), newId, position);
+        owner.sendPacket(() -> new ClientboundAddRendererPacket(newId, result.getType(), newNonce()));
+        return result;
+    }
+
+    @Override
+    public @UnmodifiableView Collection<Renderer> getRenderers() {
+        return Collections.unmodifiableList(renderers);
+    }
+
+    @Override
+    public void clearRenderers() {
+        renderers.clear();
+        getOwner().sendPacket(() -> new ClientboundClearRendererPacket(newNonce()));
+    }
+}
