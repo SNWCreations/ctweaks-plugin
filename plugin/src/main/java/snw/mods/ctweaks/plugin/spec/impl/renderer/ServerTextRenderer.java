@@ -11,6 +11,8 @@ import snw.mods.ctweaks.plugin.spec.impl.entity.ServerPlayer;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundUpdateTextRendererPacket;
 import snw.mods.ctweaks.render.TextRenderer;
 
+import java.util.Objects;
+
 import static snw.lib.protocol.util.PacketHelper.newNonce;
 
 @ToString
@@ -45,9 +47,7 @@ public class ServerTextRenderer extends AbstractServerRenderer implements TextRe
         public void update() throws IllegalStateException {
             Preconditions.checkState(!used, "Updates from this updater was already applied");
             used = true;
-            if (text != null) {
-                ServerTextRenderer.this.text = text;
-            }
+            ServerTextRenderer.this.text = Objects.requireNonNullElse(this.text, ServerTextRenderer.this.text);
             ServerTextRenderer.this.position = position;
             owner.sendPacket(() -> new ClientboundUpdateTextRendererPacket(getId(), text, position, newNonce()));
         }
