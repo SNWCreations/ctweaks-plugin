@@ -1,10 +1,12 @@
 package snw.mods.ctweaks.plugin.spec.impl.entity;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.UnmodifiableView;
 import snw.mods.ctweaks.entity.Screen;
 import snw.mods.ctweaks.object.pos.PlanePosition;
+import snw.mods.ctweaks.plugin.spec.impl.renderer.AbstractServerRenderer;
 import snw.mods.ctweaks.plugin.spec.impl.renderer.ServerTextRenderer;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundAddRendererPacket;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundClearRendererPacket;
@@ -26,12 +28,17 @@ public class ServerScreen implements Screen {
     private int nextTextRendererId;
 
     @Override
-    public TextRenderer addTextRenderer(PlanePosition position) {
+    public TextRenderer addTextRenderer(@NonNull PlanePosition position) {
         owner.ensureOnline();
         final int newId = nextTextRendererId++;
         final ServerTextRenderer result = new ServerTextRenderer(getOwner(), newId, position);
         owner.sendPacket(() -> new ClientboundAddRendererPacket(newId, result.getType(), newNonce()));
+        onRendererAdded(result);
         return result;
+    }
+
+    private void onRendererAdded(AbstractServerRenderer renderer) {
+        renderer.sendAdditionalAddPackets();
     }
 
     @Override

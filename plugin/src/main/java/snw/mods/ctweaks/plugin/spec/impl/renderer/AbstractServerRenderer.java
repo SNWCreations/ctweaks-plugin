@@ -25,4 +25,6 @@ public abstract class AbstractServerRenderer implements Renderer {
             owner.sendPacket(() -> new ClientboundRemoveRendererPacket(this.id, newNonce()));
         }
     }
+
+    public abstract void sendAdditionalAddPackets();
 }
