@@ -27,4 +27,6 @@ public abstract class AbstractServerRenderer implements Renderer {
     }
 
     public abstract void sendAdditionalAddPackets();
+
+    public abstract void sendFullUpdate();
 }

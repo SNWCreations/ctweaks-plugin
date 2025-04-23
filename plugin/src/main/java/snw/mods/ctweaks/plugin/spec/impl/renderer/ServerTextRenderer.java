@@ -36,6 +36,11 @@ public class ServerTextRenderer extends AbstractServerRenderer implements TextRe
         owner.sendPacket(() -> new ClientboundUpdateTextRendererPacket(getId(), null, position, newNonce()));
     }
 
+    @Override
+    public void sendFullUpdate() {
+        owner.sendPacket(() -> new ClientboundUpdateTextRendererPacket(getId(), this.text, position, newNonce()));
+    }
+
     class UpdaterImpl implements Updater {
         private boolean used;
         @Setter

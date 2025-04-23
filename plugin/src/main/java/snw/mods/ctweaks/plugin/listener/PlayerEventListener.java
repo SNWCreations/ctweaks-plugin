@@ -19,6 +19,7 @@ public final class PlayerEventListener implements Listener {
             debug(() -> "Player " + handle.getName() + " has registered mod channel, sending hello packet");
             final ServerPlayer wrapped = ServerPlayer.of(handle);
             wrapped.sendPacket(() -> new ClientboundHelloPacket(ModConstants.PROTOCOL_VERSION, newNonce()));
+            wrapped.onJoined();
         }
     }
 }

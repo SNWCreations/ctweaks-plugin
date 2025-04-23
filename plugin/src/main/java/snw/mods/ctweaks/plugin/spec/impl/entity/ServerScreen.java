@@ -24,7 +24,7 @@ import static snw.lib.protocol.util.PacketHelper.newNonce;
 public class ServerScreen implements Screen {
     @Getter
     private final ServerPlayer owner;
-    private final List<Renderer> renderers = new ArrayList<>();
+    private final List<AbstractServerRenderer> renderers = new ArrayList<>();
     private int nextRendererId;
 
     @Override
@@ -49,6 +49,18 @@ public class ServerScreen implements Screen {
     @Override
     public void clearRenderers() {
         renderers.clear();
+        sendClearRendererPacket();
+    }
+
+    private void sendClearRendererPacket() {
         getOwner().sendPacket(() -> new ClientboundClearRendererPacket(newNonce()));
+    }
+
+    public void sendFullUpdate() {
+        sendClearRendererPacket();
+        for (AbstractServerRenderer renderer : renderers) {
+            getOwner().sendPacket(() -> new ClientboundAddRendererPacket(renderer.getId(), renderer.getType(), newNonce()));
+            renderer.sendFullUpdate();
+        }
     }
 }
