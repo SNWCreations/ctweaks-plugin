@@ -1,5 +1,12 @@
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 plugins {
     id 'java'
+    id("xyz.jpenilla.run-paper") version "2.3.1"
+    id 'net.minecrell.plugin-yml.bukkit' version '0.6.0'
+    id 'xyz.kyngs.libby.plugin' version '1.0.0'
+    id 'com.gradleup.shadow' version '8.3.5'
 }
 
 group = parent.group
@@ -55,4 +62,72 @@ processResources {
     filesMatching('plugin.yml') {
         expand props
     }
+}
+
+bukkit {
+    name = rootProject.name
+    version = rootProject.version
+    description = "SNW's Client Tweaks."
+    authors = ["SNWCreations"]
+    apiVersion = project.bukkit_api_version
+    main = "snw.mods.ctweaks.plugin.CTweaksMain"
+    website = "https://github.com/SNWCreations/ctweaks-plugin"
+}
+
+def testServerVersion = '1.21.1'
+tasks {
+    runServer {
+        // Configure the Minecraft version for our task.
+        // This is the only required configuration besides applying the plugin.
+        // Your plugin's jar (or shadowJar if present) will be used automatically.
+        minecraftVersion(testServerVersion)
+        systemProperty("file.encoding", "UTF-8")
+        systemProperty("Paper.IgnoreJavaVersion", "true")
+    }
+}
+
+libby {
+    excludeDependency("com.alessiodp.libby:libby-bukkit:.*") // libby itself is not needed to be included in libby.json
+    setDoNotGenerateChecksum(true)
+}
+
+static def gitShortCommitId() {
+    return 'git rev-parse --short HEAD'.execute().text.trim()
+}
+
+def GIT_COMMIT = gitShortCommitId()
+
+shadowJar {
+    archiveBaseName = parent.name
+    archiveClassifier = GIT_COMMIT
+    configurations -= [project.configurations.library]
+    dependencies {
+        List.of(
+                'org.jetbrains:annotations',
+                'net.kyori:.*',
+                'com.google.guava:.*',
+                'com.google.code.findbugs:.*',
+                'com.google.errorprone:.*',
+                'com.google.j2objc:.*',
+                'it.unimi.dsi:fastutil',
+                'org.checkerframework:.*'
+        ).forEach { exclude(dependency(it)) }
+    }
+    manifest {
+        attributes(
+                'Git-Commit': GIT_COMMIT,
+                'Build-Time': DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now()),
+                'Dev-Build': dev_build
+        )
+    }
+    // Adventure should not be relocated,
+    // Reuse Adventure on Paper (and its forks) if possible
+    List.of(
+            "snw.lib.protocol"
+    ).forEach { relocate it, "snw.mods.ctweaks.include.$it" }
+}
+
+jar.enabled = false
+tasks.build {
+    dependsOn tasks.shadowJar
 }

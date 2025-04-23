@@ -1,7 +1,0 @@
-name: snwctweaks
-version: '1.0.0'
-main: snw.mods.ctweaks.plugin.CTweaksMain
-api-version: '1.20'
-authors: [SNWCreations]
-description: SNW's Client Tweaks.
-website: https://github.com/SNWCreations/ctweaks-plugin

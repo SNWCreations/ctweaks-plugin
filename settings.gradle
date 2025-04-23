@@ -1,4 +1,23 @@
-rootProject.name = 'SNWCTweaks-Plugin'
+pluginManagement {
+    repositories {
+        maven {
+            url = uri("https://repo.kyngs.xyz/gradle-plugins")
+        }
+        gradlePluginPortal()
+        maven {
+            url = "https://jitpack.io/"
+        }
+    }
+    resolutionStrategy {
+        eachPlugin {
+            if(requested.id.id == "xyz.kyngs.libby.plugin") {
+                useModule('com.github.SNWCreations:libby-gradle-plugin:9cac32f396')
+            }
+        }
+    }
+}
+
+rootProject.name = 'snwctweaks'
 
 include 'spec'
 include 'plugin'
