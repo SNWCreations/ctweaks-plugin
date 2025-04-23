@@ -25,12 +25,12 @@ public class ServerScreen implements Screen {
     @Getter
     private final ServerPlayer owner;
     private final List<Renderer> renderers = new ArrayList<>();
-    private int nextTextRendererId;
+    private int nextRendererId;
 
     @Override
     public TextRenderer addTextRenderer(@NonNull PlanePosition position) {
         owner.ensureOnline();
-        final int newId = nextTextRendererId++;
+        final int newId = nextRendererId++;
         final ServerTextRenderer result = new ServerTextRenderer(getOwner(), newId, position);
         owner.sendPacket(() -> new ClientboundAddRendererPacket(newId, result.getType(), newNonce()));
         onRendererAdded(result);
