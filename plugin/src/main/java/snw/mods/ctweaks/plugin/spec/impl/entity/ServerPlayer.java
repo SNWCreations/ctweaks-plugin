@@ -51,10 +51,14 @@ public final class ServerPlayer implements Player {
     public void sendPacket(Supplier<Packet<ClientboundPacketHandler>> packetSupplier) {
         final org.bukkit.entity.Player handle = getHandle();
         if (handle != null) {
-            final Packet<ClientboundPacketHandler> packet = packetSupplier.get();
-            debug(() -> "Sending packet " + packet + " to player " + handle.getName());
-            final byte[] rawPacket = packet.serialize();
-            handle.sendPluginMessage(CTweaksMain.getInstance(), ModConstants.CHANNEL, rawPacket);
+            if (handle.getListeningPluginChannels().contains(ModConstants.CHANNEL)) {
+                final Packet<ClientboundPacketHandler> packet = packetSupplier.get();
+                debug(() -> "Sending packet " + packet + " to player " + handle.getName());
+                final byte[] rawPacket = packet.serialize();
+                handle.sendPluginMessage(CTweaksMain.getInstance(), ModConstants.CHANNEL, rawPacket);
+            } else {
+                debug(() -> "Ignoring packet to " + handle.getName() + " as the player does not have CTweaks mod installed");
+            }
         } else {
             debug(() -> "Ignoring packet to " + getUUID() + " as the player was not online");
         }
