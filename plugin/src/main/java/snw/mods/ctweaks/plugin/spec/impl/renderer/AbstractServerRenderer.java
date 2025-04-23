@@ -6,6 +6,7 @@ import snw.mods.ctweaks.protocol.packet.s2c.ClientboundRemoveRendererPacket;
 import snw.mods.ctweaks.render.Renderer;
 
 import static snw.lib.protocol.util.PacketHelper.newNonce;
+import static snw.mods.ctweaks.plugin.util.Logging.debug;
 
 public abstract class AbstractServerRenderer implements Renderer {
     @Getter
@@ -23,6 +24,9 @@ public abstract class AbstractServerRenderer implements Renderer {
         if (!removed) {
             removed = true;
             owner.sendPacket(() -> new ClientboundRemoveRendererPacket(this.id, newNonce()));
+            debug(() -> "Removed renderer with ID " + this.id);
+        } else {
+            debug(() -> "Attempted to remove a dead renderer with ID " + this.id);
         }
     }
 
