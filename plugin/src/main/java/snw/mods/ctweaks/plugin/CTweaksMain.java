@@ -24,6 +24,7 @@ public final class CTweaksMain extends JavaPlugin {
 
         protocolServer = new ProtocolServer();
         getServer().getMessenger().registerIncomingPluginChannel(this, ModConstants.CHANNEL, protocolServer);
+        getServer().getMessenger().registerOutgoingPluginChannel(this, ModConstants.CHANNEL);
     }
 
     @Override
