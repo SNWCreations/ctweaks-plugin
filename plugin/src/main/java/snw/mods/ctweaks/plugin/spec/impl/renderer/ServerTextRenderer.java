@@ -3,7 +3,6 @@ package snw.mods.ctweaks.plugin.spec.impl.renderer;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import lombok.ToString;
 import net.kyori.adventure.text.Component;
 import snw.mods.ctweaks.object.pos.PlanePosition;
@@ -43,17 +42,27 @@ public class ServerTextRenderer extends AbstractServerRenderer implements TextRe
 
     class UpdaterImpl implements Updater {
         private boolean used;
-        @Setter
         private Component text;
-        @Setter
-        private @NonNull PlanePosition position;
+        private PlanePosition position;
+
+        @Override
+        public Updater setText(Component text) {
+            this.text = text;
+            return this;
+        }
+
+        @Override
+        public Updater setPosition(@NonNull PlanePosition position) {
+            this.position = position;
+            return this;
+        }
 
         @Override
         public void update() throws IllegalStateException {
             Preconditions.checkState(!used, "Updates from this updater was already applied");
             used = true;
             ServerTextRenderer.this.text = Objects.requireNonNullElse(this.text, ServerTextRenderer.this.text);
-            ServerTextRenderer.this.position = position;
+            ServerTextRenderer.this.position = Objects.requireNonNullElse(this.position, ServerTextRenderer.this.position);
             owner.sendPacket(() -> new ClientboundUpdateTextRendererPacket(getId(), text, position, newNonce()));
         }
     }
