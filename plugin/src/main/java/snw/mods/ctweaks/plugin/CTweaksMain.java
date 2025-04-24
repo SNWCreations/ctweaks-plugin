@@ -5,6 +5,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import snw.mods.ctweaks.ModConstants;
 import snw.mods.ctweaks.plugin.listener.PlayerEventListener;
 import snw.mods.ctweaks.plugin.protocol.ProtocolServer;
+import snw.mods.ctweaks.plugin.util.Debugging;
+
+import java.io.IOException;
+import java.util.jar.JarFile;
 
 public final class CTweaksMain extends JavaPlugin {
     @Getter
@@ -15,6 +19,12 @@ public final class CTweaksMain extends JavaPlugin {
     @Override
     public void onLoad() {
         instance = this;
+
+        try (JarFile jarFile = new JarFile(getFile())) {
+            Debugging.enabled = Boolean.parseBoolean(jarFile.getManifest().getMainAttributes().getValue("Dev-Build"));
+        } catch (IOException e) {
+            getSLF4JLogger().error("Failed to read build information", e);
+        }
     }
 
     @Override
