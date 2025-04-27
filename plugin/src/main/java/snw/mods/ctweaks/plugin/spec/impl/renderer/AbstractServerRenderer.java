@@ -23,6 +23,7 @@ public abstract class AbstractServerRenderer implements Renderer {
     public void remove() {
         if (!removed) {
             removed = true;
+            owner.getScreen().removeRenderer(this);
             owner.sendPacket(() -> new ClientboundRemoveRendererPacket(this.id, newNonce()));
             debug(() -> "Removed renderer with ID " + this.id);
         } else {

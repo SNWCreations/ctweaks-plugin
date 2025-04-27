@@ -3,6 +3,7 @@ package snw.mods.ctweaks.plugin.spec.impl.entity;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.UnmodifiableView;
 import snw.mods.ctweaks.entity.Screen;
 import snw.mods.ctweaks.object.pos.PlanePosition;
@@ -39,6 +40,12 @@ public class ServerScreen implements Screen {
 
     private void onRendererAdded(AbstractServerRenderer renderer) {
         renderer.sendAdditionalAddPackets();
+        renderers.add(renderer);
+    }
+
+    @ApiStatus.Internal
+    public void removeRenderer(AbstractServerRenderer renderer) {
+        renderers.remove(renderer);
     }
 
     @Override
