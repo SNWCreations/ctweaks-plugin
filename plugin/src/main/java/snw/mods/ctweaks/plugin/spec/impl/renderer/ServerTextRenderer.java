@@ -1,11 +1,11 @@
 package snw.mods.ctweaks.plugin.spec.impl.renderer;
 
-import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import net.kyori.adventure.text.Component;
 import snw.mods.ctweaks.object.pos.PlanePosition;
+import snw.mods.ctweaks.plugin.spec.impl.AbstractUpdater;
 import snw.mods.ctweaks.plugin.spec.impl.entity.ServerPlayer;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundUpdateTextRendererPacket;
 import snw.mods.ctweaks.render.TextRenderer;
@@ -40,27 +40,27 @@ public class ServerTextRenderer extends AbstractServerRenderer implements TextRe
         owner.sendPacket(() -> new ClientboundUpdateTextRendererPacket(getId(), this.text, position, newNonce()));
     }
 
-    class UpdaterImpl implements Updater {
-        private boolean used;
+    class UpdaterImpl extends AbstractUpdater implements Updater {
         private Component text;
         private PlanePosition position;
 
         @Override
         public Updater setText(Component text) {
+            ensureNotApplied();
             this.text = text;
             return this;
         }
 
         @Override
         public Updater setPosition(@NonNull PlanePosition position) {
+            ensureNotApplied();
             this.position = position;
             return this;
         }
 
         @Override
         public void update() throws IllegalStateException {
-            Preconditions.checkState(!used, "Updates from this updater was already applied");
-            used = true;
+            super.update();
             ServerTextRenderer.this.text = Objects.requireNonNullElse(this.text, ServerTextRenderer.this.text);
             ServerTextRenderer.this.position = Objects.requireNonNullElse(this.position, ServerTextRenderer.this.position);
             owner.sendPacket(() -> new ClientboundUpdateTextRendererPacket(getId(), text, position, newNonce()));
