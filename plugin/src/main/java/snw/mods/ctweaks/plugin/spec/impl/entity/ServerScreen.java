@@ -9,6 +9,7 @@ import snw.mods.ctweaks.entity.Screen;
 import snw.mods.ctweaks.object.pos.PlanePosition;
 import snw.mods.ctweaks.plugin.spec.impl.renderer.AbstractServerRenderer;
 import snw.mods.ctweaks.plugin.spec.impl.renderer.ServerTextRenderer;
+import snw.mods.ctweaks.protocol.packet.c2s.ServerboundWindowPropertiesPacket;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundAddRendererPacket;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundClearRendererPacket;
 import snw.mods.ctweaks.render.Renderer;
@@ -20,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static snw.lib.protocol.util.PacketHelper.newNonce;
+import static snw.mods.ctweaks.ModConstants.UNIT_AS_INT;
 
 @RequiredArgsConstructor
 public class ServerScreen implements Screen {
@@ -27,6 +29,12 @@ public class ServerScreen implements Screen {
     private final ServerPlayer owner;
     private final List<AbstractServerRenderer> renderers = new ArrayList<>();
     private int nextRendererId;
+    @Getter
+    private int width = UNIT_AS_INT;
+    @Getter
+    private int height = UNIT_AS_INT;
+    @Getter
+    private boolean nowFullScreen;
 
     @Override
     public TextRenderer addTextRenderer(@NonNull PlanePosition position) {
@@ -69,5 +77,11 @@ public class ServerScreen implements Screen {
             getOwner().sendPacket(() -> new ClientboundAddRendererPacket(renderer.getId(), renderer.getType(), newNonce()));
             renderer.sendFullUpdate();
         }
+    }
+
+    public void update(ServerboundWindowPropertiesPacket packet) {
+        this.width = packet.getWidth();
+        this.height = packet.getHeight();
+        this.nowFullScreen = packet.isNowFullScreen();
     }
 }
