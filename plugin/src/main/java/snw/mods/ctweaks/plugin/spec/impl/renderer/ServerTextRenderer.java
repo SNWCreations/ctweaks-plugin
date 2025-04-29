@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 import snw.mods.ctweaks.object.pos.PlanePosition;
 import snw.mods.ctweaks.plugin.spec.impl.AbstractUpdater;
 import snw.mods.ctweaks.plugin.spec.impl.entity.ServerPlayer;
@@ -22,9 +23,11 @@ public class ServerTextRenderer extends AbstractServerRenderer implements TextRe
     private float scale = 1.0F;
     private boolean noShadow;
 
-    public ServerTextRenderer(ServerPlayer owner, int id, PlanePosition position) {
+    public ServerTextRenderer(ServerPlayer owner, int id, PlanePosition position, @Nullable Component text, float scale) {
         super(owner, id);
         this.position = position;
+        this.text = text;
+        this.scale = scale;
     }
 
     @Override

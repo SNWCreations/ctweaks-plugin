@@ -3,7 +3,9 @@ package snw.mods.ctweaks.plugin.spec.impl.entity;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 import snw.mods.ctweaks.entity.Screen;
 import snw.mods.ctweaks.object.pos.PlanePosition;
@@ -36,10 +38,10 @@ public class ServerScreen implements Screen {
     private boolean nowFullScreen;
 
     @Override
-    public TextRenderer addTextRenderer(@NonNull PlanePosition position) {
+    public TextRenderer addTextRenderer(@NonNull PlanePosition position, @Nullable Component text, float scale) {
         owner.ensureOnline();
         final int newId = nextRendererId++;
-        final ServerTextRenderer result = new ServerTextRenderer(getOwner(), newId, position);
+        final ServerTextRenderer result = new ServerTextRenderer(getOwner(), newId, position, text, scale);
         onRendererAdded(result);
         return result;
     }
