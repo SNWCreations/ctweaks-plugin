@@ -8,17 +8,16 @@ import org.jetbrains.annotations.UnmodifiableView;
 import snw.mods.ctweaks.entity.Screen;
 import snw.mods.ctweaks.object.pos.PlanePosition;
 import snw.mods.ctweaks.plugin.spec.impl.renderer.AbstractServerRenderer;
+import snw.mods.ctweaks.plugin.spec.impl.renderer.ServerPlayerFaceRenderer;
 import snw.mods.ctweaks.plugin.spec.impl.renderer.ServerTextRenderer;
 import snw.mods.ctweaks.protocol.packet.c2s.ServerboundWindowPropertiesPacket;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundAddRendererPacket;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundClearRendererPacket;
+import snw.mods.ctweaks.render.PlayerFaceRenderer;
 import snw.mods.ctweaks.render.Renderer;
 import snw.mods.ctweaks.render.TextRenderer;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static snw.lib.protocol.util.PacketHelper.newNonce;
 import static snw.mods.ctweaks.ModConstants.UNIT_AS_INT;
@@ -41,12 +40,21 @@ public class ServerScreen implements Screen {
         owner.ensureOnline();
         final int newId = nextRendererId++;
         final ServerTextRenderer result = new ServerTextRenderer(getOwner(), newId, position);
-        owner.sendPacket(() -> new ClientboundAddRendererPacket(newId, result.getType(), newNonce()));
+        onRendererAdded(result);
+        return result;
+    }
+
+    @Override
+    public PlayerFaceRenderer addPlayerFaceRenderer(UUID target, PlanePosition position, float scale) {
+        owner.ensureOnline();
+        final int newId = nextRendererId++;
+        final ServerPlayerFaceRenderer result = new ServerPlayerFaceRenderer(getOwner(), newId, target, position, scale);
         onRendererAdded(result);
         return result;
     }
 
     private void onRendererAdded(AbstractServerRenderer renderer) {
+        owner.sendPacket(() -> new ClientboundAddRendererPacket(renderer.getId(), renderer.getType(), newNonce()));
         renderer.sendAdditionalAddPackets();
         renderers.add(renderer);
     }
