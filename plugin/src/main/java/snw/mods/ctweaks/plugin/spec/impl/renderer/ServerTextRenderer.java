@@ -37,7 +37,7 @@ public class ServerTextRenderer extends AbstractServerRenderer implements TextRe
 
     @Override
     public void sendAdditionalAddPackets() {
-        owner.sendPacket(() -> new ClientboundUpdateTextRendererPacket(getId(), null, position, noShadow, scale, newNonce()));
+        sendFullUpdate();
     }
 
     @Override
@@ -85,7 +85,14 @@ public class ServerTextRenderer extends AbstractServerRenderer implements TextRe
             ServerTextRenderer.this.position = Objects.requireNonNullElse(this.position, ServerTextRenderer.this.position);
             ServerTextRenderer.this.noShadow = Objects.requireNonNullElse(this.noShadow, ServerTextRenderer.this.noShadow);
             ServerTextRenderer.this.scale = Objects.requireNonNullElse(this.scale, ServerTextRenderer.this.scale);
-            owner.sendPacket(() -> new ClientboundUpdateTextRendererPacket(getId(), text, position, noShadow, scale, newNonce()));
+            owner.sendPacket(() -> new ClientboundUpdateTextRendererPacket(
+                    getId(),
+                    ServerTextRenderer.this.text,
+                    ServerTextRenderer.this.position,
+                    ServerTextRenderer.this.noShadow,
+                    ServerTextRenderer.this.scale,
+                    newNonce()
+            ));
         }
     }
 }
