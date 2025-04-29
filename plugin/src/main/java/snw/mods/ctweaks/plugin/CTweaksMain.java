@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 import snw.mods.ctweaks.ModConstants;
 import snw.mods.ctweaks.plugin.listener.PlayerEventListener;
-import snw.mods.ctweaks.plugin.protocol.ProtocolServer;
+import snw.mods.ctweaks.plugin.net.ProtocolServer;
 import snw.mods.ctweaks.plugin.util.Debugging;
 
 import java.io.IOException;

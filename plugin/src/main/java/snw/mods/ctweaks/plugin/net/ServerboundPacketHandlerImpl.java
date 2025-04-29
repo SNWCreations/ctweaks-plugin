@@ -1,4 +1,4 @@
-package snw.mods.ctweaks.plugin.protocol;
+package snw.mods.ctweaks.plugin.net;
 
 import lombok.RequiredArgsConstructor;
 import snw.mods.ctweaks.plugin.spec.impl.entity.ServerPlayer;

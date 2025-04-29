@@ -1,4 +1,4 @@
-package snw.mods.ctweaks.plugin.protocol;
+package snw.mods.ctweaks.plugin.net;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
