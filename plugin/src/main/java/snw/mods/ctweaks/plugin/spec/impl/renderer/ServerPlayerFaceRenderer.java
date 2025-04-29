@@ -72,9 +72,9 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
             ServerPlayerFaceRenderer.this.size = requireNonNullElse(this.size, ServerPlayerFaceRenderer.this.size);
             owner.sendPacket(() -> new ClientboundUpdatePlayerFaceRendererPacket(
                     getId(),
-                    ServerPlayerFaceRenderer.this.target,
-                    ServerPlayerFaceRenderer.this.position,
-                    ServerPlayerFaceRenderer.this.size,
+                    this.target,
+                    this.position,
+                    this.size,
                     newNonce()
             ));
         }

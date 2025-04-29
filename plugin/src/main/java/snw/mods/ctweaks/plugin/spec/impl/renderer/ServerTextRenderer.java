@@ -87,10 +87,10 @@ public class ServerTextRenderer extends AbstractServerRenderer implements TextRe
             ServerTextRenderer.this.scale = Objects.requireNonNullElse(this.scale, ServerTextRenderer.this.scale);
             owner.sendPacket(() -> new ClientboundUpdateTextRendererPacket(
                     getId(),
-                    ServerTextRenderer.this.text,
-                    ServerTextRenderer.this.position,
-                    ServerTextRenderer.this.noShadow,
-                    ServerTextRenderer.this.scale,
+                    this.text,
+                    this.position,
+                    this.noShadow,
+                    this.scale,
                     newNonce()
             ));
         }
