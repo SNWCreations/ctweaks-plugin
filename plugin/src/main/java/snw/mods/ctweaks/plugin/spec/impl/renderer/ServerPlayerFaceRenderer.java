@@ -17,7 +17,7 @@ import static snw.lib.protocol.util.PacketHelper.newNonce;
 public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements PlayerFaceRenderer {
     private UUID target;
     private PlanePosition position;
-    private float scale = 1.0F;
+    private float scale;
 
     public ServerPlayerFaceRenderer(ServerPlayer owner, int id, UUID target, PlanePosition position, float scale) {
         super(owner, id);

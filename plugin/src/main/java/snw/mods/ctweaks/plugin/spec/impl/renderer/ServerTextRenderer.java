@@ -20,7 +20,7 @@ import static snw.lib.protocol.util.PacketHelper.newNonce;
 public class ServerTextRenderer extends AbstractServerRenderer implements TextRenderer {
     private PlanePosition position;
     private Component text;
-    private float scale = 1.0F;
+    private float scale;
     private boolean noShadow;
 
     public ServerTextRenderer(ServerPlayer owner, int id, PlanePosition position, @Nullable Component text, float scale) {
