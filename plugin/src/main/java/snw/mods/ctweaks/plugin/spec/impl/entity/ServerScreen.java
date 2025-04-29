@@ -47,10 +47,10 @@ public class ServerScreen implements Screen {
     }
 
     @Override
-    public PlayerFaceRenderer addPlayerFaceRenderer(UUID target, PlanePosition position, float scale) {
+    public PlayerFaceRenderer addPlayerFaceRenderer(UUID target, PlanePosition position, int size) {
         owner.ensureOnline();
         final int newId = nextRendererId++;
-        final ServerPlayerFaceRenderer result = new ServerPlayerFaceRenderer(getOwner(), newId, target, position, scale);
+        final ServerPlayerFaceRenderer result = new ServerPlayerFaceRenderer(getOwner(), newId, target, position, size);
         onRendererAdded(result);
         return result;
     }

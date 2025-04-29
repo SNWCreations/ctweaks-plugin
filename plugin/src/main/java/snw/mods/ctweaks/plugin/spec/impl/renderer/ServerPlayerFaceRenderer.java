@@ -17,13 +17,13 @@ import static snw.lib.protocol.util.PacketHelper.newNonce;
 public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements PlayerFaceRenderer {
     private UUID target;
     private PlanePosition position;
-    private float scale;
+    private int size;
 
-    public ServerPlayerFaceRenderer(ServerPlayer owner, int id, UUID target, PlanePosition position, float scale) {
+    public ServerPlayerFaceRenderer(ServerPlayer owner, int id, UUID target, PlanePosition position, int size) {
         super(owner, id);
         this.target = target;
         this.position = position;
-        this.scale = scale;
+        this.size = size;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
 
     @Override
     public void sendFullUpdate() {
-        owner.sendPacket(() -> new ClientboundUpdatePlayerFaceRendererPacket(getId(), target, position, scale, newNonce()));
+        owner.sendPacket(() -> new ClientboundUpdatePlayerFaceRendererPacket(getId(), target, position, size, newNonce()));
     }
 
     @Override
@@ -44,7 +44,7 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
     class UpdaterImpl extends AbstractUpdater implements Updater {
         private UUID target;
         private PlanePosition position;
-        private Float scale;
+        private Integer size;
 
         @Override
         public Updater setTarget(@NonNull UUID target) {
@@ -59,8 +59,8 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
         }
 
         @Override
-        public Updater setScale(float scale) {
-            this.scale = scale;
+        public Updater setSize(int size) {
+            this.size = size;
             return this;
         }
 
@@ -69,12 +69,12 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
             super.update();
             ServerPlayerFaceRenderer.this.target = requireNonNullElse(this.target, ServerPlayerFaceRenderer.this.target);
             ServerPlayerFaceRenderer.this.position = requireNonNullElse(this.position, ServerPlayerFaceRenderer.this.position);
-            ServerPlayerFaceRenderer.this.scale = requireNonNullElse(this.scale, ServerPlayerFaceRenderer.this.scale);
+            ServerPlayerFaceRenderer.this.size = requireNonNullElse(this.size, ServerPlayerFaceRenderer.this.size);
             owner.sendPacket(() -> new ClientboundUpdatePlayerFaceRendererPacket(
                     getId(),
                     ServerPlayerFaceRenderer.this.target,
                     ServerPlayerFaceRenderer.this.position,
-                    ServerPlayerFaceRenderer.this.scale,
+                    ServerPlayerFaceRenderer.this.size,
                     newNonce()
             ));
         }
