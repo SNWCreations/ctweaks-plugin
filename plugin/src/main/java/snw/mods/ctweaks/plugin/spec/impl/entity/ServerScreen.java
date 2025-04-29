@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 import snw.mods.ctweaks.entity.Screen;
 import snw.mods.ctweaks.object.pos.PlanePosition;
+import snw.mods.ctweaks.plugin.event.PlayerWindowPropertiesUpdateEvent;
 import snw.mods.ctweaks.plugin.spec.impl.renderer.AbstractServerRenderer;
 import snw.mods.ctweaks.plugin.spec.impl.renderer.ServerPlayerFaceRenderer;
 import snw.mods.ctweaks.plugin.spec.impl.renderer.ServerTextRenderer;
@@ -93,5 +94,6 @@ public class ServerScreen implements Screen {
         this.width = packet.getWidth();
         this.height = packet.getHeight();
         this.nowFullScreen = packet.isNowFullScreen();
+        new PlayerWindowPropertiesUpdateEvent(owner).callEvent();
     }
 }
