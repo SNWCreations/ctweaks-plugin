@@ -40,7 +40,7 @@ public class ServerScreen implements Screen {
 
     @Override
     public TextRenderer addTextRenderer(@NonNull PlanePosition position, @Nullable Component text, float scale) {
-        owner.ensureOnline();
+        owner.ensureCanOperate();
         final int newId = nextRendererId++;
         final ServerTextRenderer result = new ServerTextRenderer(getOwner(), newId, position, text, scale);
         onRendererAdded(result);
@@ -49,7 +49,7 @@ public class ServerScreen implements Screen {
 
     @Override
     public PlayerFaceRenderer addPlayerFaceRenderer(UUID target, PlanePosition position, int size) {
-        owner.ensureOnline();
+        owner.ensureCanOperate();
         final int newId = nextRendererId++;
         final ServerPlayerFaceRenderer result = new ServerPlayerFaceRenderer(getOwner(), newId, target, position, size);
         onRendererAdded(result);

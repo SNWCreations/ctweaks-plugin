@@ -3,6 +3,7 @@ package snw.mods.ctweaks.plugin.net;
 import lombok.RequiredArgsConstructor;
 import snw.mods.ctweaks.plugin.spec.impl.entity.ServerPlayer;
 import snw.mods.ctweaks.protocol.handler.ServerboundPacketHandler;
+import snw.mods.ctweaks.protocol.packet.c2s.ServerboundReadyPacket;
 import snw.mods.ctweaks.protocol.packet.c2s.ServerboundWindowPropertiesPacket;
 
 import static snw.mods.ctweaks.plugin.util.Logging.debug;
@@ -12,6 +13,15 @@ public class ServerboundPacketHandlerImpl implements ServerboundPacketHandler {
     private final ServerPlayer owner;
 
     public void close() {
+    }
+
+    @Override
+    public void handleReady(ServerboundReadyPacket packet) {
+        if (!owner.ready) {
+            owner.ready = true;
+        } else {
+            debug(() -> "Client sent ready packet while it is in ready state");
+        }
     }
 
     @Override

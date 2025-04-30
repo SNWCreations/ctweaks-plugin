@@ -3,6 +3,7 @@ package snw.mods.ctweaks.plugin.spec.impl.entity;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.ApiStatus;
 import snw.lib.protocol.packet.Packet;
 import snw.mods.ctweaks.ModConstants;
 import snw.mods.ctweaks.entity.Player;
@@ -19,6 +20,8 @@ public final class ServerPlayer implements Player {
     private final UUID uuid;
     @Getter
     private final ServerScreen screen;
+    @ApiStatus.Internal
+    public boolean ready;
 
     public static ServerPlayer of(org.bukkit.entity.Player handle) {
         return CACHE.computeIfAbsent(handle, it -> new ServerPlayer(handle.getUniqueId()));
@@ -42,6 +45,11 @@ public final class ServerPlayer implements Player {
 
     public void ensureOnline() {
         Preconditions.checkState(isOnline(), "Player is not online");
+    }
+
+    public void ensureCanOperate() {
+        ensureOnline();
+        Preconditions.checkState(ready, "Player client is not ready");
     }
 
     public org.bukkit.entity.Player getHandle() {
