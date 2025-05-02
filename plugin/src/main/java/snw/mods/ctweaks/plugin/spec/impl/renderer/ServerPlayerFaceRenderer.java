@@ -1,14 +1,20 @@
 package snw.mods.ctweaks.plugin.spec.impl.renderer;
 
+import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import snw.mods.ctweaks.object.pos.PlanePosition;
 import snw.mods.ctweaks.plugin.spec.impl.AbstractUpdater;
 import snw.mods.ctweaks.plugin.spec.impl.entity.ServerPlayer;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundUpdatePlayerFaceRendererPacket;
 import snw.mods.ctweaks.render.PlayerFaceRenderer;
 
+import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.IntSupplier;
 
 import static java.util.Objects.requireNonNullElse;
 import static snw.lib.protocol.util.PacketHelper.newNonce;
@@ -17,13 +23,16 @@ import static snw.lib.protocol.util.PacketHelper.newNonce;
 public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements PlayerFaceRenderer {
     private UUID target;
     private PlanePosition position;
-    private int size;
+    private int size = 12;
 
-    public ServerPlayerFaceRenderer(ServerPlayer owner, int id, UUID target, PlanePosition position, int size) {
+    public ServerPlayerFaceRenderer(ServerPlayer owner, int id) {
         super(owner, id);
+    }
+
+    public ServerPlayerFaceRenderer(ServerPlayer owner, int id, UUID target, PlanePosition position) {
+        this(owner, id);
         this.target = target;
         this.position = position;
-        this.size = size;
     }
 
     @Override
@@ -39,6 +48,10 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
     @Override
     public Updater newUpdater() {
         return new UpdaterImpl();
+    }
+
+    private static void validateSize(int size) throws IllegalArgumentException {
+        Preconditions.checkArgument(size > 0 && size % 12 == 0, "size must be positive and multiply of 12");
     }
 
     class UpdaterImpl extends AbstractUpdater implements Updater {
@@ -60,6 +73,7 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
 
         @Override
         public Updater setSize(int size) {
+            validateSize(size);
             this.size = size;
             return this;
         }
@@ -77,6 +91,51 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
                     this.size,
                     newNonce()
             ));
+        }
+    }
+
+    @RequiredArgsConstructor
+    public static class BuilderImpl implements Builder {
+        private final ServerPlayer owner;
+        private final IntSupplier idGetter;
+        private final Consumer<ServerPlayerFaceRenderer> buildCallback;
+
+        private UUID target;
+        private PlanePosition position;
+        private @Nullable Integer size;
+
+        @Override
+        public PlayerFaceRenderer build() {
+            owner.ensureOnline();
+            Preconditions.checkNotNull(target, "target cannot be null");
+            Preconditions.checkNotNull(position, "position cannot be null");
+
+            ServerPlayerFaceRenderer result = new ServerPlayerFaceRenderer(owner, idGetter.getAsInt());
+            result.target = this.target;
+            result.position = this.position;
+            result.size = Objects.requireNonNullElse(this.size, result.size);
+
+            buildCallback.accept(result);
+            return result;
+        }
+
+        @Override
+        public Builder setTarget(@NonNull UUID target) {
+            this.target = target;
+            return this;
+        }
+
+        @Override
+        public Builder setPosition(@NonNull PlanePosition position) {
+            this.position = position;
+            return this;
+        }
+
+        @Override
+        public Builder setSize(int size) {
+            validateSize(size);
+            this.size = size;
+            return this;
         }
     }
 }

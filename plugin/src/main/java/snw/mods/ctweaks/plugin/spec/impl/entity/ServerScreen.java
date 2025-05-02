@@ -21,6 +21,7 @@ import snw.mods.ctweaks.render.Renderer;
 import snw.mods.ctweaks.render.TextRenderer;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static snw.lib.protocol.util.PacketHelper.newNonce;
 import static snw.mods.ctweaks.ModConstants.UNIT_AS_INT;
@@ -30,7 +31,7 @@ public class ServerScreen implements Screen {
     @Getter
     private final ServerPlayer owner;
     private final List<AbstractServerRenderer> renderers = new ArrayList<>();
-    private int nextRendererId;
+    private final AtomicInteger rendererIdGenerator = new AtomicInteger();
     @Getter
     private int width = UNIT_AS_INT;
     @Getter
@@ -39,21 +40,33 @@ public class ServerScreen implements Screen {
     private boolean nowFullScreen;
 
     @Override
-    public TextRenderer addTextRenderer(@NonNull PlanePosition position, @Nullable Component text, float scale) {
+    public TextRenderer addTextRenderer(@NonNull PlanePosition position, @Nullable Component text) {
         owner.ensureCanOperate();
-        final int newId = nextRendererId++;
-        final ServerTextRenderer result = new ServerTextRenderer(getOwner(), newId, position, text, scale);
+        final int newId = rendererIdGenerator.getAndIncrement();
+        final ServerTextRenderer result = new ServerTextRenderer(getOwner(), newId, position, text);
         onRendererAdded(result);
         return result;
     }
 
     @Override
-    public PlayerFaceRenderer addPlayerFaceRenderer(UUID target, PlanePosition position, int size) {
+    public TextRenderer.Builder textRendererBuilder() {
         owner.ensureCanOperate();
-        final int newId = nextRendererId++;
-        final ServerPlayerFaceRenderer result = new ServerPlayerFaceRenderer(getOwner(), newId, target, position, size);
+        return new ServerTextRenderer.BuilderImpl(owner, rendererIdGenerator::getAndIncrement, this::onRendererAdded);
+    }
+
+    @Override
+    public PlayerFaceRenderer addPlayerFaceRenderer(UUID target, PlanePosition position) {
+        owner.ensureCanOperate();
+        final int newId = rendererIdGenerator.getAndIncrement();
+        final ServerPlayerFaceRenderer result = new ServerPlayerFaceRenderer(getOwner(), newId, target, position);
         onRendererAdded(result);
         return result;
+    }
+
+    @Override
+    public PlayerFaceRenderer.Builder playerFaceRendererBuilder() {
+        owner.ensureCanOperate();
+        return new ServerPlayerFaceRenderer.BuilderImpl(owner, rendererIdGenerator::getAndIncrement, this::onRendererAdded);
     }
 
     private void onRendererAdded(AbstractServerRenderer renderer) {
