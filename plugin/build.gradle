@@ -5,7 +5,6 @@ plugins {
     id 'java'
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id 'net.minecrell.plugin-yml.bukkit' version '0.6.0'
-    id 'xyz.kyngs.libby.plugin' version '1.0.0'
     id 'com.gradleup.shadow' version '8.3.5'
 }
 
@@ -84,11 +83,6 @@ tasks {
         systemProperty("file.encoding", "UTF-8")
         systemProperty("Paper.IgnoreJavaVersion", "true")
     }
-}
-
-libby {
-    excludeDependency("com.alessiodp.libby:libby-bukkit:.*") // libby itself is not needed to be included in libby.json
-    setDoNotGenerateChecksum(true)
 }
 
 static def gitShortCommitId() {
