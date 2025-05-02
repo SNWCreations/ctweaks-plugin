@@ -21,7 +21,7 @@ import static snw.mods.ctweaks.plugin.util.Logging.*;
 
 public class ProtocolServer implements PluginMessageListener {
     private final StandardPacketDeserializer<ServerboundPacketHandler> packetDeserializer;
-    private final WeakHashMap<ServerPlayer, ServerboundPacketHandlerImpl> packetHandlers = new WeakHashMap<>();
+    private final Map<ServerPlayer, ServerboundPacketHandlerImpl> packetHandlers = new WeakHashMap<>();
 
     public ProtocolServer() {
         this.packetDeserializer = new StandardPacketDeserializer<>(PacketTypes.CLIENTSIDE);
@@ -29,6 +29,13 @@ public class ProtocolServer implements PluginMessageListener {
 
     public ServerboundPacketHandlerImpl getOrNewInPacketHandler(ServerPlayer wrapped) {
         return packetHandlers.computeIfAbsent(wrapped, ServerboundPacketHandlerImpl::new);
+    }
+
+    public void onDisconnect(ServerPlayer who) {
+        ServerboundPacketHandlerImpl inHandler = packetHandlers.remove(who);
+        if (inHandler != null) {
+            inHandler.close();
+        }
     }
 
     public void close() {

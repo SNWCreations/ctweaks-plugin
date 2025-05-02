@@ -3,6 +3,7 @@ package snw.mods.ctweaks.plugin.spec.impl.entity;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.ApiStatus;
 import snw.lib.protocol.packet.Packet;
 import snw.mods.ctweaks.ModConstants;
 import snw.mods.ctweaks.entity.Player;
@@ -15,7 +16,8 @@ import java.util.function.Supplier;
 import static snw.mods.ctweaks.plugin.util.Logging.debug;
 
 public final class ServerPlayer implements Player {
-    private static final WeakHashMap<org.bukkit.entity.Player, ServerPlayer> CACHE = new WeakHashMap<>();
+    @ApiStatus.Internal
+    public static final Map<UUID, ServerPlayer> CACHE = new HashMap<>();
     private final UUID uuid;
     @Getter
     private final ServerScreen screen;
@@ -23,7 +25,7 @@ public final class ServerPlayer implements Player {
     public boolean modReady;
 
     public static ServerPlayer of(org.bukkit.entity.Player handle) {
-        return CACHE.computeIfAbsent(handle, it -> new ServerPlayer(handle.getUniqueId()));
+        return CACHE.computeIfAbsent(handle.getUniqueId(), ServerPlayer::new);
     }
 
     private ServerPlayer(UUID uuid) {
