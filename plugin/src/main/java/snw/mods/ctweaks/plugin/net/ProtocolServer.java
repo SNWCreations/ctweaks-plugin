@@ -15,12 +15,13 @@ import snw.mods.ctweaks.protocol.handler.ServerboundPacketHandler;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import static snw.mods.ctweaks.plugin.util.Logging.*;
 
 public class ProtocolServer implements PluginMessageListener {
     private final StandardPacketDeserializer<ServerboundPacketHandler> packetDeserializer;
-    private final Map<ServerPlayer, ServerboundPacketHandlerImpl> packetHandlers = new HashMap<>();
+    private final WeakHashMap<ServerPlayer, ServerboundPacketHandlerImpl> packetHandlers = new WeakHashMap<>();
 
     public ProtocolServer() {
         this.packetDeserializer = new StandardPacketDeserializer<>(PacketTypes.CLIENTSIDE);
