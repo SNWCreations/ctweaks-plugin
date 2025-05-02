@@ -18,8 +18,8 @@ public class ServerboundPacketHandlerImpl implements ServerboundPacketHandler {
 
     @Override
     public void handleReady(ServerboundReadyPacket packet) {
-        if (!owner.ready) {
-            owner.ready = true;
+        if (!owner.modReady) {
+            owner.modReady = true;
             new PlayerModReadyEvent(owner).callEvent();
         } else {
             debug(() -> "Client sent ready packet while it is in ready state");
