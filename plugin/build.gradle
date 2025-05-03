@@ -123,8 +123,13 @@ shadowJar {
     ).forEach { relocate it, "snw.mods.ctweaks.include.$it" }
 }
 
-tasks.build {
-    dependsOn tasks.shadowJar
+boolean noShadow = Boolean.parseBoolean(System.getProperty("noShadow"))
+if (!noShadow) {
+    tasks.assemble {
+        dependsOn tasks.shadowJar
+    }
+} else {
+    shadowJar.enabled = false
 }
 
 publishing {
