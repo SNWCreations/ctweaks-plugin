@@ -3,6 +3,7 @@ import java.time.format.DateTimeFormatter
 
 plugins {
     id 'java'
+    id 'java-library'
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id 'net.minecrell.plugin-yml.bukkit' version '0.6.0'
     id 'com.gradleup.shadow' version '8.3.5'
@@ -31,7 +32,7 @@ def lombok = "org.projectlombok:lombok:1.18.32"
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
 
-    implementation project(":spec")
+    api project(":spec")
 
     compileOnly lombok
     annotationProcessor lombok
