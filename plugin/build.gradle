@@ -6,6 +6,7 @@ plugins {
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id 'net.minecrell.plugin-yml.bukkit' version '0.6.0'
     id 'com.gradleup.shadow' version '8.3.5'
+    id 'maven-publish'
 }
 
 group = parent.group
@@ -44,6 +45,7 @@ java {
     if (JavaVersion.current() < javaVersion) {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
+    withSourcesJar()
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -121,7 +123,18 @@ shadowJar {
     ).forEach { relocate it, "snw.mods.ctweaks.include.$it" }
 }
 
-jar.enabled = false
 tasks.build {
     dependsOn tasks.shadowJar
+}
+
+publishing {
+    publications {
+        artifact(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        mavenLocal()
+    }
 }
