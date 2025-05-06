@@ -10,15 +10,22 @@ import org.jetbrains.annotations.UnmodifiableView;
 import snw.mods.ctweaks.entity.Screen;
 import snw.mods.ctweaks.object.pos.PlanePosition;
 import snw.mods.ctweaks.plugin.event.PlayerWindowPropertiesUpdateEvent;
+import snw.mods.ctweaks.plugin.spec.impl.layout.AbstractServerLayout;
+import snw.mods.ctweaks.plugin.spec.impl.layout.ServerGridLayout;
 import snw.mods.ctweaks.plugin.spec.impl.renderer.AbstractServerRenderer;
 import snw.mods.ctweaks.plugin.spec.impl.renderer.ServerPlayerFaceRenderer;
 import snw.mods.ctweaks.plugin.spec.impl.renderer.ServerTextRenderer;
 import snw.mods.ctweaks.protocol.packet.c2s.ServerboundWindowPropertiesPacket;
+import snw.mods.ctweaks.protocol.packet.s2c.ClientboundAddLayoutPacket;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundAddRendererPacket;
+import snw.mods.ctweaks.protocol.packet.s2c.ClientboundClearLayoutPacket;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundClearRendererPacket;
 import snw.mods.ctweaks.render.PlayerFaceRenderer;
 import snw.mods.ctweaks.render.Renderer;
 import snw.mods.ctweaks.render.TextRenderer;
+import snw.mods.ctweaks.render.layout.GridLayout;
+import snw.mods.ctweaks.render.layout.Layout;
+import snw.mods.ctweaks.render.layout.LinearLayout;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,6 +38,7 @@ public class ServerScreen implements Screen {
     @Getter
     private final ServerPlayer owner;
     private final List<AbstractServerRenderer> renderers = new ArrayList<>();
+    private final List<AbstractServerLayout> layouts = new ArrayList<>();
     private final AtomicInteger rendererIdGenerator = new AtomicInteger();
     @Getter
     private int width = UNIT_AS_INT;
@@ -69,15 +77,36 @@ public class ServerScreen implements Screen {
         return new ServerPlayerFaceRenderer.BuilderImpl(owner, rendererIdGenerator::getAndIncrement, this::onRendererAdded);
     }
 
+    @Override
+    public GridLayout.Builder gridLayoutBuilder() {
+        return new ServerGridLayout.BuilderImpl(owner, rendererIdGenerator::getAndIncrement, this::onLayoutAdded);
+    }
+
+    @Override
+    public LinearLayout.Builder linearLayoutBuilder() {
+        throw new UnsupportedOperationException("not implemented yet"); // todo implement linear layout
+    }
+
     private void onRendererAdded(AbstractServerRenderer renderer) {
         owner.sendPacket(() -> new ClientboundAddRendererPacket(renderer.getId(), renderer.getType(), newNonce()));
         renderer.sendAdditionalAddPackets();
         renderers.add(renderer);
     }
 
+    private void onLayoutAdded(AbstractServerLayout layout) {
+        owner.sendPacket(() -> new ClientboundAddLayoutPacket(layout.describe(), newNonce()));
+        layout.sendAdditionalAddPackets();
+        layouts.add(layout);
+    }
+
     @ApiStatus.Internal
     public void removeRenderer(AbstractServerRenderer renderer) {
         renderers.remove(renderer);
+    }
+
+    @ApiStatus.Internal
+    public void removeLayout(AbstractServerLayout layout) {
+        layouts.remove(layout);
     }
 
     @Override
@@ -86,20 +115,40 @@ public class ServerScreen implements Screen {
     }
 
     @Override
+    public @UnmodifiableView Collection<Layout> getLayouts() {
+        return Collections.unmodifiableList(layouts);
+    }
+
+    @Override
     public void clearRenderers() {
         renderers.clear();
         sendClearRendererPacket();
+    }
+
+    @Override
+    public void clearLayouts() {
+        layouts.clear();
+        sendClearLayoutPacket();
     }
 
     private void sendClearRendererPacket() {
         getOwner().sendPacket(() -> new ClientboundClearRendererPacket(newNonce()));
     }
 
+    private void sendClearLayoutPacket() {
+        getOwner().sendPacket(() -> new ClientboundClearLayoutPacket(newNonce()));
+    }
+
     public void sendFullUpdate() {
         sendClearRendererPacket();
+        sendClearLayoutPacket();
         for (AbstractServerRenderer renderer : renderers) {
             getOwner().sendPacket(() -> new ClientboundAddRendererPacket(renderer.getId(), renderer.getType(), newNonce()));
             renderer.sendFullUpdate();
+        }
+        for (AbstractServerLayout layout : layouts) {
+            getOwner().sendPacket(() -> new ClientboundAddLayoutPacket(layout.describe(), newNonce()));
+            layout.sendFullUpdate();
         }
     }
 

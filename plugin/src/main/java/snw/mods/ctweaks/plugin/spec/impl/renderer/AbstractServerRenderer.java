@@ -1,6 +1,7 @@
 package snw.mods.ctweaks.plugin.spec.impl.renderer;
 
 import lombok.Getter;
+import snw.mods.ctweaks.plugin.spec.ServerSideObject;
 import snw.mods.ctweaks.plugin.spec.impl.entity.ServerPlayer;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundRemoveRendererPacket;
 import snw.mods.ctweaks.render.Renderer;
@@ -8,7 +9,7 @@ import snw.mods.ctweaks.render.Renderer;
 import static snw.lib.protocol.util.PacketHelper.newNonce;
 import static snw.mods.ctweaks.plugin.util.Logging.debug;
 
-public abstract class AbstractServerRenderer implements Renderer {
+public abstract class AbstractServerRenderer implements Renderer, ServerSideObject {
     @Getter
     private final int id;
     protected final ServerPlayer owner;
@@ -30,8 +31,4 @@ public abstract class AbstractServerRenderer implements Renderer {
             debug(() -> "Attempted to remove a dead renderer with ID " + this.id);
         }
     }
-
-    public abstract void sendAdditionalAddPackets();
-
-    public abstract void sendFullUpdate();
 }
