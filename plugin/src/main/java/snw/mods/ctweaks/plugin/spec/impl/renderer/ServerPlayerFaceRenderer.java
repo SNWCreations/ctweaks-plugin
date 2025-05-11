@@ -36,13 +36,10 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
     }
 
     @Override
-    public void sendAdditionalAddPackets() {
-        sendFullUpdate();
-    }
-
-    @Override
-    public void sendFullUpdate() {
-        owner.sendPacket(() -> new ClientboundUpdatePlayerFaceRendererPacket(getId(), target, position, size, newNonce()));
+    public String sendFullUpdate() {
+        String nonce = newNonce();
+        owner.sendPacket(() -> new ClientboundUpdatePlayerFaceRendererPacket(getId(), target, position, size, nonce));
+        return nonce;
     }
 
     @Override
@@ -52,6 +49,11 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
 
     private static void validateSize(int size) throws IllegalArgumentException {
         Preconditions.checkArgument(size > 0 && size % 12 == 0, "size must be positive and multiply of 12");
+    }
+
+    @Override
+    public void setPosition(PlanePosition position) {
+        newUpdater().setPosition(position).update();
     }
 
     class UpdaterImpl extends AbstractUpdater implements Updater {

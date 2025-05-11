@@ -45,13 +45,15 @@ public class ServerTextRenderer extends AbstractServerRenderer implements TextRe
     }
 
     @Override
-    public void sendAdditionalAddPackets() {
-        sendFullUpdate();
+    public String sendFullUpdate() {
+        String nonce = newNonce();
+        owner.sendPacket(() -> new ClientboundUpdateTextRendererPacket(getId(), text, position, noShadow, scale, outlineColor, nonce));
+        return nonce;
     }
 
     @Override
-    public void sendFullUpdate() {
-        owner.sendPacket(() -> new ClientboundUpdateTextRendererPacket(getId(), text, position, noShadow, scale, outlineColor, newNonce()));
+    public void setPosition(PlanePosition position) {
+        newUpdater().setPosition(position).update();
     }
 
     class UpdaterImpl extends AbstractUpdater implements Updater {

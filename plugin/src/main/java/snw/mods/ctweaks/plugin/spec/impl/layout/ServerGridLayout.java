@@ -16,7 +16,7 @@ import snw.mods.ctweaks.render.layout.GridLayout;
 import snw.mods.ctweaks.render.layout.LayoutElement;
 
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.IntSupplier;
 
 import static java.util.Collections.emptyList;
@@ -45,12 +45,8 @@ public class ServerGridLayout extends AbstractServerLayout implements GridLayout
     }
 
     @Override
-    public void sendAdditionalAddPackets() {
-        sendFullUpdate();
-    }
-
-    @Override
-    public void sendFullUpdate() {
+    public String sendFullUpdate() {
+        String nonce = newNonce();
         owner.sendPacket(() -> new ClientboundUpdateGridLayoutPacket(
                 getId(),
                 mapToDescriptor(this.children),
@@ -60,13 +56,19 @@ public class ServerGridLayout extends AbstractServerLayout implements GridLayout
                 this.columnSpacing,
                 this.rowCount,
                 this.columnCount,
-                newNonce()
+                nonce
         ));
+        return nonce;
     }
 
     @Override
     public GridLayout.Updater newUpdater() {
         return new UpdaterImpl();
+    }
+
+    @Override
+    public void setPosition(PlanePosition position) {
+        newUpdater().setPosition(position).update();
     }
 
     public class UpdaterImpl extends AbstractUpdater implements GridLayout.Updater {
@@ -77,6 +79,7 @@ public class ServerGridLayout extends AbstractServerLayout implements GridLayout
         private @Nullable Integer columnCount;
         private @Nullable PlanePosition position;
         private @Nullable Rectangle range;
+        private @Nullable Runnable afterUpdateCallback;
 
         private List<LayoutElement> getUpdatedChildren() {
             if (updatedChildren == null) {
@@ -153,6 +156,12 @@ public class ServerGridLayout extends AbstractServerLayout implements GridLayout
         }
 
         @Override
+        public GridLayout.Updater setAfterUpdateCallback(Runnable callback) {
+            this.afterUpdateCallback = callback;
+            return this;
+        }
+
+        @Override
         public void update() throws IllegalStateException {
             super.update();
             ServerGridLayout.this.children = requireNonNullElse(this.updatedChildren, ServerGridLayout.this.children);
@@ -162,19 +171,23 @@ public class ServerGridLayout extends AbstractServerLayout implements GridLayout
             ServerGridLayout.this.columnCount = requireNonNullElse(this.columnCount, ServerGridLayout.this.columnCount);
             ServerGridLayout.this.position = requireNonNullElse(this.position, ServerGridLayout.this.position);
             ServerGridLayout.this.range = requireNonNullElse(this.range, ServerGridLayout.this.range);
+            String nonce = newNonce();
             owner.sendPacket(() -> new ClientboundUpdateGridLayoutPacket(
                     getId(),
                     mapToDescriptor(this.updatedChildren),
                     this.position,
                     this.range == null ? null : Optional.of(this.range),
-                    this.rowSpacing, this.columnSpacing, this.rowCount, this.columnCount, newNonce()));
+                    this.rowSpacing, this.columnSpacing, this.rowCount, this.columnCount, nonce));
+            if (this.afterUpdateCallback != null) {
+                owner.registerAfterUpdateCallback(nonce, this.afterUpdateCallback);
+            }
         }
     }
 
     public static class BuilderImpl implements GridLayout.Builder {
         private final ServerPlayer owner;
         private final IntSupplier idProvider;
-        private final Consumer<ServerGridLayout> builtCallback;
+        private final Function<ServerGridLayout, String> builtCallback;
         private @Nullable List<LayoutElement> elements;
         private @Nullable Integer rowSpacing;
         private @Nullable Integer columnSpacing;
@@ -182,8 +195,9 @@ public class ServerGridLayout extends AbstractServerLayout implements GridLayout
         private @Nullable Integer columnCount;
         private PlanePosition position;
         private @Nullable Rectangle range;
+        private @Nullable Runnable afterUpdateCallback;
 
-        public BuilderImpl(ServerPlayer owner, IntSupplier idProvider, Consumer<ServerGridLayout> builtCallback) {
+        public BuilderImpl(ServerPlayer owner, IntSupplier idProvider, Function<ServerGridLayout, String> builtCallback) {
             this.owner = owner;
             this.idProvider = idProvider;
             this.builtCallback = builtCallback;
@@ -206,7 +220,10 @@ public class ServerGridLayout extends AbstractServerLayout implements GridLayout
             result.columnCount = requireNonNullElse(this.columnCount, result.columnCount);
             result.position = this.position;
             result.range = this.range;
-            builtCallback.accept(result);
+            String nonce = builtCallback.apply(result);
+            if (this.afterUpdateCallback != null) {
+                owner.registerAfterUpdateCallback(nonce, this.afterUpdateCallback);
+            }
             return result;
         }
 
@@ -261,6 +278,12 @@ public class ServerGridLayout extends AbstractServerLayout implements GridLayout
         @Override
         public GridLayout.Builder setRange(@Nullable Rectangle range) {
             this.range = range;
+            return this;
+        }
+
+        @Override
+        public GridLayout.Builder setAfterUpdateCallback(Runnable callback) {
+            this.afterUpdateCallback = callback;
             return this;
         }
     }

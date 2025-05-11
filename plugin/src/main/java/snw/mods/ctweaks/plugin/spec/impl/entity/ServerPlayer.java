@@ -73,6 +73,10 @@ public final class ServerPlayer implements Player {
         }
     }
 
+    public void registerAfterUpdateCallback(String nonce, Runnable callback) {
+        CTweaksMain.getInstance().getProtocolServer().getOrNewInPacketHandler(this).registerAfterUpdateCallback(nonce, callback);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

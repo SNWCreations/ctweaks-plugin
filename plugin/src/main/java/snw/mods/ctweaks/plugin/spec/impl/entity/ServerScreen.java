@@ -1,13 +1,17 @@
 package snw.mods.ctweaks.plugin.spec.impl.entity;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 import snw.mods.ctweaks.entity.Screen;
+import snw.mods.ctweaks.object.IntKeyed;
 import snw.mods.ctweaks.object.pos.PlanePosition;
 import snw.mods.ctweaks.plugin.event.PlayerWindowPropertiesUpdateEvent;
 import snw.mods.ctweaks.plugin.spec.impl.layout.AbstractServerLayout;
@@ -37,8 +41,8 @@ import static snw.mods.ctweaks.ModConstants.UNIT_AS_INT;
 public class ServerScreen implements Screen {
     @Getter
     private final ServerPlayer owner;
-    private final List<AbstractServerRenderer> renderers = new ArrayList<>();
-    private final List<AbstractServerLayout> layouts = new ArrayList<>();
+    private final Int2ObjectMap<AbstractServerRenderer> renderers = new Int2ObjectLinkedOpenHashMap<>();
+    private final Int2ObjectMap<AbstractServerLayout> layouts = new Int2ObjectLinkedOpenHashMap<>();
     private final AtomicInteger rendererIdGenerator = new AtomicInteger();
     @Getter
     private int width = UNIT_AS_INT;
@@ -87,16 +91,18 @@ public class ServerScreen implements Screen {
         throw new UnsupportedOperationException("not implemented yet"); // todo implement linear layout
     }
 
-    private void onRendererAdded(AbstractServerRenderer renderer) {
-        owner.sendPacket(() -> new ClientboundAddRendererPacket(renderer.getId(), renderer.getType(), newNonce()));
-        renderer.sendAdditionalAddPackets();
-        renderers.add(renderer);
+    private String onRendererAdded(AbstractServerRenderer renderer) {
+        owner.sendPacket(() -> new ClientboundAddRendererPacket(renderer.describe(), newNonce()));
+        String nonce = renderer.sendFullUpdate();
+        renderers.put(renderer.getId(), renderer);
+        return nonce;
     }
 
-    private void onLayoutAdded(AbstractServerLayout layout) {
+    private String onLayoutAdded(AbstractServerLayout layout) {
         owner.sendPacket(() -> new ClientboundAddLayoutPacket(layout.describe(), newNonce()));
-        layout.sendAdditionalAddPackets();
-        layouts.add(layout);
+        String nonce = layout.sendFullUpdate();
+        layouts.put(layout.getId(), layout);
+        return nonce;
     }
 
     @ApiStatus.Internal
@@ -110,13 +116,13 @@ public class ServerScreen implements Screen {
     }
 
     @Override
-    public @UnmodifiableView Collection<Renderer> getRenderers() {
-        return Collections.unmodifiableList(renderers);
+    public @UnmodifiableView Collection<? extends Renderer> getRenderers() {
+        return renderers.values().stream().toList();
     }
 
     @Override
-    public @UnmodifiableView Collection<Layout> getLayouts() {
-        return Collections.unmodifiableList(layouts);
+    public @UnmodifiableView Collection<? extends Layout> getLayouts() {
+        return layouts.values().stream().toList();
     }
 
     @Override
@@ -142,14 +148,28 @@ public class ServerScreen implements Screen {
     public void sendFullUpdate() {
         sendClearRendererPacket();
         sendClearLayoutPacket();
-        for (AbstractServerRenderer renderer : renderers) {
-            getOwner().sendPacket(() -> new ClientboundAddRendererPacket(renderer.getId(), renderer.getType(), newNonce()));
+        for (AbstractServerRenderer renderer : renderers.values()) {
+            getOwner().sendPacket(() -> new ClientboundAddRendererPacket(renderer.describe(), newNonce()));
             renderer.sendFullUpdate();
         }
-        for (AbstractServerLayout layout : layouts) {
+        for (AbstractServerLayout layout : layouts.values()) {
             getOwner().sendPacket(() -> new ClientboundAddLayoutPacket(layout.describe(), newNonce()));
             layout.sendFullUpdate();
         }
+    }
+
+    public @Nullable IntKeyed lookupObject(IntKeyed.Descriptor descriptor) {
+        int id = descriptor.id();
+        Key type = descriptor.type();
+        Int2ObjectMap<? extends IntKeyed> registry;
+        if (type.equals(Renderer.TYPE)) {
+            registry = renderers;
+        } else if (type.equals(Layout.TYPE)) {
+            registry = layouts;
+        } else {
+            throw new IllegalArgumentException("Unknown object type " + type);
+        }
+        return registry.get(id);
     }
 
     public void update(ServerboundWindowPropertiesPacket packet) {
