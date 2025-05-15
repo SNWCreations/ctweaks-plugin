@@ -7,6 +7,7 @@ import snw.lib.protocol.packet.Packet;
 import snw.mods.ctweaks.plugin.spec.ServerSideObject;
 import snw.mods.ctweaks.plugin.spec.impl.entity.ServerPlayer;
 import snw.mods.ctweaks.protocol.handler.ClientboundPacketHandler;
+import snw.mods.ctweaks.protocol.packet.s2c.ClientboundArrangeLayoutPacket;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundRemoveLayoutPacket;
 import snw.mods.ctweaks.render.layout.Layout;
 import snw.mods.ctweaks.render.layout.LayoutElement;
@@ -28,6 +29,13 @@ public abstract class AbstractServerLayout implements Layout, ServerSideObject {
     protected AbstractServerLayout(ServerPlayer owner, int id) {
         this.owner = owner;
         this.id = id;
+    }
+
+    @Override
+    public void arrangeElements() {
+        if (!removed) {
+            owner.sendPacket(() -> new ClientboundArrangeLayoutPacket(describe(), newNonce()));
+        }
     }
 
     @Override
