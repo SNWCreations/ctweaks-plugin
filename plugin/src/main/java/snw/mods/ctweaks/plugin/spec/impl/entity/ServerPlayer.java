@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 import snw.lib.protocol.packet.Packet;
 import snw.mods.ctweaks.ModConstants;
 import snw.mods.ctweaks.entity.Player;
@@ -73,7 +74,10 @@ public final class ServerPlayer implements Player {
         }
     }
 
-    public void registerAfterUpdateCallback(String nonce, Runnable callback) {
+    public void registerAfterUpdateCallback(String nonce, @Nullable Runnable callback) {
+        if (callback == null) {
+            return;
+        }
         CTweaksMain.getInstance().getProtocolServer().getOrNewInPacketHandler(this).registerAfterUpdateCallback(nonce, callback);
     }
 

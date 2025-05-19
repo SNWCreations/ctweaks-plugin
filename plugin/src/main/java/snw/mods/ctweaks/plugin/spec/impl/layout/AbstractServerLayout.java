@@ -32,9 +32,11 @@ public abstract class AbstractServerLayout implements Layout, ServerSideObject {
     }
 
     @Override
-    public void arrangeElements() {
+    public void arrangeElements(@Nullable Runnable onFinish) {
         if (!removed) {
-            owner.sendPacket(() -> new ClientboundArrangeLayoutPacket(describe(), newNonce()));
+            String nonce = newNonce();
+            owner.sendPacket(() -> new ClientboundArrangeLayoutPacket(describe(), nonce));
+            owner.registerAfterUpdateCallback(nonce, onFinish);
         }
     }
 
