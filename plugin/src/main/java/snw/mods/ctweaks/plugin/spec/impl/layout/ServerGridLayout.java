@@ -13,6 +13,7 @@ import snw.mods.ctweaks.plugin.spec.impl.entity.ServerPlayer;
 import snw.mods.ctweaks.protocol.handler.ClientboundPacketHandler;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundUpdateGridLayoutPacket;
 import snw.mods.ctweaks.render.layout.GridLayout;
+import snw.mods.ctweaks.render.layout.Layout;
 import snw.mods.ctweaks.render.layout.LayoutElement;
 
 import java.util.*;
@@ -24,6 +25,7 @@ import static java.util.Objects.requireNonNullElse;
 import static java.util.Objects.requireNonNullElseGet;
 import static snw.lib.protocol.util.PacketHelper.newNonce;
 import static snw.mods.ctweaks.plugin.net.ServerPacketHelper.mapToDescriptor;
+import static snw.mods.ctweaks.plugin.util.Checker.ensureCanAddLayoutElement;
 
 @Getter
 public class ServerGridLayout extends AbstractServerLayout implements GridLayout {
@@ -103,18 +105,21 @@ public class ServerGridLayout extends AbstractServerLayout implements GridLayout
 
         @Override
         public GridLayout.Updater addChild(LayoutElement element) {
+            ensureCanAddLayoutElement(ServerGridLayout.this, element);
             getUpdatedChildren().add(element);
             return this;
         }
 
         @Override
         public GridLayout.Updater addChild(int index, LayoutElement element) {
+            ensureCanAddLayoutElement(ServerGridLayout.this, element);
             getUpdatedChildren().add(index, element);
             return this;
         }
 
         @Override
         public GridLayout.Updater setChild(int index, LayoutElement element) {
+            ensureCanAddLayoutElement(ServerGridLayout.this, element);
             getUpdatedChildren().set(index, element);
             return this;
         }
