@@ -2,7 +2,6 @@ package snw.mods.ctweaks.plugin.spec.impl.renderer;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import net.kyori.adventure.text.Component;
@@ -71,7 +70,7 @@ public class ServerTextRenderer extends AbstractServerRenderer implements TextRe
         }
 
         @Override
-        public Updater setPosition(@NonNull PlanePosition position) {
+        public Updater setPosition(PlanePosition position) {
             ensureNotApplied();
             this.position = position;
             return this;
@@ -152,7 +151,7 @@ public class ServerTextRenderer extends AbstractServerRenderer implements TextRe
         }
 
         @Override
-        public Builder setPosition(@NonNull PlanePosition position) {
+        public Builder setPosition(PlanePosition position) {
             this.position = position;
             return this;
         }

@@ -3,7 +3,6 @@ package snw.mods.ctweaks.plugin.spec.impl.entity;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -52,7 +51,12 @@ public class ServerScreen implements Screen {
     private boolean nowFullScreen;
 
     @Override
-    public TextRenderer addTextRenderer(@NonNull PlanePosition position, @Nullable Component text) {
+    public TextRenderer addTextRenderer() {
+        return addTextRenderer(null, null);
+    }
+
+    @Override
+    public TextRenderer addTextRenderer(@Nullable Component text, @Nullable PlanePosition position) {
         owner.ensureCanOperate();
         final int newId = rendererIdGenerator.getAndIncrement();
         final ServerTextRenderer result = new ServerTextRenderer(getOwner(), newId, position, text);
@@ -67,7 +71,12 @@ public class ServerScreen implements Screen {
     }
 
     @Override
-    public PlayerFaceRenderer addPlayerFaceRenderer(UUID target, PlanePosition position) {
+    public PlayerFaceRenderer addPlayerFaceRenderer(UUID target) {
+        return addPlayerFaceRenderer(target, null);
+    }
+
+    @Override
+    public PlayerFaceRenderer addPlayerFaceRenderer(UUID target, @Nullable PlanePosition position) {
         owner.ensureCanOperate();
         final int newId = rendererIdGenerator.getAndIncrement();
         final ServerPlayerFaceRenderer result = new ServerPlayerFaceRenderer(getOwner(), newId, target, position);
