@@ -13,7 +13,6 @@ import snw.mods.ctweaks.plugin.spec.impl.entity.ServerPlayer;
 import snw.mods.ctweaks.protocol.handler.ClientboundPacketHandler;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundUpdateGridLayoutPacket;
 import snw.mods.ctweaks.render.layout.GridLayout;
-import snw.mods.ctweaks.render.layout.Layout;
 import snw.mods.ctweaks.render.layout.LayoutElement;
 
 import java.util.*;

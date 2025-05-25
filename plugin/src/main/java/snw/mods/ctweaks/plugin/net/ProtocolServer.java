@@ -13,11 +13,11 @@ import snw.mods.ctweaks.plugin.spec.impl.entity.ServerPlayer;
 import snw.mods.ctweaks.protocol.PacketTypes;
 import snw.mods.ctweaks.protocol.handler.ServerboundPacketHandler;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import static snw.mods.ctweaks.plugin.util.Logging.*;
+import static snw.mods.ctweaks.plugin.util.Logging.debug;
+import static snw.mods.ctweaks.plugin.util.Logging.error;
 
 public class ProtocolServer implements PluginMessageListener {
     private final StandardPacketDeserializer<ServerboundPacketHandler> packetDeserializer;

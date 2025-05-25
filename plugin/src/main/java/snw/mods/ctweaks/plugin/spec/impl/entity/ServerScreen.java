@@ -30,7 +30,8 @@ import snw.mods.ctweaks.render.layout.GridLayout;
 import snw.mods.ctweaks.render.layout.Layout;
 import snw.mods.ctweaks.render.layout.LinearLayout;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static snw.lib.protocol.util.PacketHelper.newNonce;
