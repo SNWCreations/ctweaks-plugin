@@ -1,6 +1,5 @@
 package snw.mods.ctweaks.plugin.spec.impl.renderer;
 
-import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -100,7 +99,7 @@ public class ServerTextRenderer extends AbstractServerRenderer implements TextRe
         public void update() throws IllegalStateException {
             super.update();
             ServerTextRenderer.this.text = Objects.requireNonNullElse(this.text, ServerTextRenderer.this.text);
-            ServerTextRenderer.this.position = Objects.requireNonNullElse(this.position, ServerTextRenderer.this.position);
+            ServerTextRenderer.this.position = this.position;
             ServerTextRenderer.this.noShadow = Objects.requireNonNullElse(this.noShadow, ServerTextRenderer.this.noShadow);
             ServerTextRenderer.this.scale = Objects.requireNonNullElse(this.scale, ServerTextRenderer.this.scale);
             ServerTextRenderer.this.outlineColor = Objects.requireNonNullElse(this.outlineColor, ServerTextRenderer.this.outlineColor);
@@ -131,7 +130,6 @@ public class ServerTextRenderer extends AbstractServerRenderer implements TextRe
         @Override
         public TextRenderer build() {
             owner.ensureOnline();
-            Preconditions.checkNotNull(position, "position cannot be null");
 
             ServerTextRenderer result = new ServerTextRenderer(owner, idGetter.getAsInt());
             result.text = this.text;

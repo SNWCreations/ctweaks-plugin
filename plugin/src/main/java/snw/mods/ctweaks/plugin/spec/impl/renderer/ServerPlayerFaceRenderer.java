@@ -22,14 +22,14 @@ import static snw.lib.protocol.util.PacketHelper.newNonce;
 @Getter
 public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements PlayerFaceRenderer {
     private UUID target;
-    private PlanePosition position;
+    private @Nullable PlanePosition position;
     private int size = 12;
 
     public ServerPlayerFaceRenderer(ServerPlayer owner, int id) {
         super(owner, id);
     }
 
-    public ServerPlayerFaceRenderer(ServerPlayer owner, int id, UUID target, PlanePosition position) {
+    public ServerPlayerFaceRenderer(ServerPlayer owner, int id, UUID target, @Nullable PlanePosition position) {
         this(owner, id);
         this.target = target;
         this.position = position;
@@ -58,7 +58,7 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
 
     class UpdaterImpl extends AbstractUpdater implements Updater {
         private UUID target;
-        private PlanePosition position;
+        private @Nullable PlanePosition position;
         private Integer size;
 
         @Override
@@ -68,7 +68,7 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
         }
 
         @Override
-        public Updater setPosition(@NonNull PlanePosition position) {
+        public Updater setPosition(@Nullable PlanePosition position) {
             this.position = position;
             return this;
         }
@@ -84,7 +84,7 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
         public void update() throws IllegalStateException {
             super.update();
             ServerPlayerFaceRenderer.this.target = requireNonNullElse(this.target, ServerPlayerFaceRenderer.this.target);
-            ServerPlayerFaceRenderer.this.position = requireNonNullElse(this.position, ServerPlayerFaceRenderer.this.position);
+            ServerPlayerFaceRenderer.this.position = this.position;
             ServerPlayerFaceRenderer.this.size = requireNonNullElse(this.size, ServerPlayerFaceRenderer.this.size);
             owner.sendPacket(() -> new ClientboundUpdatePlayerFaceRendererPacket(
                     getId(),
@@ -103,14 +103,13 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
         private final Consumer<ServerPlayerFaceRenderer> buildCallback;
 
         private UUID target;
-        private PlanePosition position;
+        private @Nullable PlanePosition position;
         private @Nullable Integer size;
 
         @Override
         public PlayerFaceRenderer build() {
             owner.ensureOnline();
             Preconditions.checkNotNull(target, "target cannot be null");
-            Preconditions.checkNotNull(position, "position cannot be null");
 
             ServerPlayerFaceRenderer result = new ServerPlayerFaceRenderer(owner, idGetter.getAsInt());
             result.target = this.target;
@@ -128,7 +127,7 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
         }
 
         @Override
-        public Builder setPosition(@NonNull PlanePosition position) {
+        public Builder setPosition(@Nullable PlanePosition position) {
             this.position = position;
             return this;
         }
