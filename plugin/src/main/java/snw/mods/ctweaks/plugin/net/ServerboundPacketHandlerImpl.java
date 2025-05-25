@@ -1,10 +1,12 @@
 package snw.mods.ctweaks.plugin.net;
 
+import it.unimi.dsi.fastutil.Pair;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import snw.mods.ctweaks.object.IntKeyed;
 import snw.mods.ctweaks.object.pos.PlanePosition;
 import snw.mods.ctweaks.plugin.event.PlayerModReadyEvent;
+import snw.mods.ctweaks.plugin.spec.PlanePosInternalSetter;
 import snw.mods.ctweaks.plugin.spec.impl.entity.ServerPlayer;
 import snw.mods.ctweaks.protocol.handler.ServerboundPacketHandler;
 import snw.mods.ctweaks.protocol.packet.c2s.ServerboundObjectUpdatedPacket;
@@ -54,12 +56,15 @@ public class ServerboundPacketHandlerImpl implements ServerboundPacketHandler {
 
     @Override
     public void handleSetPlanePos(ServerboundSetObjectPlanePosPacket packet) {
-        IntKeyed.Descriptor descriptor = packet.getTargetDescriptor();
-        IntKeyed target = owner.getScreen().lookupObject(descriptor);
-        if (target instanceof PlanePosition.Setter setter) {
-            setter.setPosition(packet.getNewPosition());
-        } else {
-            log.error("Attempted to update plane position of an object ({}) which does not have plane position", descriptor);
+        for (Pair<IntKeyed.Descriptor, PlanePosition> targetPair : packet.getTargets()) {
+            IntKeyed.Descriptor descriptor = targetPair.left();
+            PlanePosition pos = targetPair.right();
+            IntKeyed target = owner.getScreen().lookupObject(descriptor);
+            if (target instanceof PlanePosInternalSetter setter) {
+                setter.setPositionInternal(pos);
+            } else {
+                log.error("Attempted to update plane position of an object ({}) which does not have plane position", descriptor);
+            }
         }
     }
 

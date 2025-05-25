@@ -6,6 +6,7 @@ import lombok.ToString;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 import snw.mods.ctweaks.object.pos.PlanePosition;
+import snw.mods.ctweaks.plugin.spec.PlanePosInternalSetter;
 import snw.mods.ctweaks.plugin.spec.impl.AbstractUpdater;
 import snw.mods.ctweaks.plugin.spec.impl.entity.ServerPlayer;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundUpdateTextRendererPacket;
@@ -20,7 +21,7 @@ import static snw.mods.ctweaks.ModConstants.UNIT_AS_INT;
 
 @ToString
 @Getter
-public class ServerTextRenderer extends AbstractServerRenderer implements TextRenderer {
+public class ServerTextRenderer extends AbstractServerRenderer implements TextRenderer, PlanePosInternalSetter {
     private PlanePosition position;
     private Component text;
     private float scale = 1.0F;
@@ -52,6 +53,11 @@ public class ServerTextRenderer extends AbstractServerRenderer implements TextRe
     @Override
     public void setPosition(PlanePosition position) {
         newUpdater().setPosition(position).update();
+    }
+
+    @Override
+    public void setPositionInternal(PlanePosition position) {
+        this.position = position;
     }
 
     class UpdaterImpl extends AbstractUpdater implements Updater {

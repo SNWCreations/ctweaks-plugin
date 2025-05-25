@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 import snw.mods.ctweaks.object.pos.PlanePosition;
+import snw.mods.ctweaks.plugin.spec.PlanePosInternalSetter;
 import snw.mods.ctweaks.plugin.spec.impl.AbstractUpdater;
 import snw.mods.ctweaks.plugin.spec.impl.entity.ServerPlayer;
 import snw.mods.ctweaks.protocol.packet.s2c.ClientboundUpdatePlayerFaceRendererPacket;
@@ -20,7 +21,7 @@ import static java.util.Objects.requireNonNullElse;
 import static snw.lib.protocol.util.PacketHelper.newNonce;
 
 @Getter
-public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements PlayerFaceRenderer {
+public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements PlayerFaceRenderer, PlanePosInternalSetter {
     private UUID target;
     private @Nullable PlanePosition position;
     private int size = 12;
@@ -54,6 +55,11 @@ public class ServerPlayerFaceRenderer extends AbstractServerRenderer implements 
     @Override
     public void setPosition(PlanePosition position) {
         newUpdater().setPosition(position).update();
+    }
+
+    @Override
+    public void setPositionInternal(PlanePosition position) {
+        this.position = position;
     }
 
     class UpdaterImpl extends AbstractUpdater implements Updater {
