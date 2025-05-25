@@ -116,12 +116,12 @@ public class ServerScreen implements Screen {
 
     @ApiStatus.Internal
     public void removeRenderer(AbstractServerRenderer renderer) {
-        renderers.remove(renderer);
+        renderers.values().remove(renderer);
     }
 
     @ApiStatus.Internal
     public void removeLayout(AbstractServerLayout layout) {
-        layouts.remove(layout);
+        layouts.values().remove(layout);
     }
 
     @Override
