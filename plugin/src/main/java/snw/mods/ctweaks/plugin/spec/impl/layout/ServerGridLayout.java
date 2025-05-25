@@ -175,7 +175,7 @@ public class ServerGridLayout extends AbstractServerLayout implements GridLayout
             ServerGridLayout.this.rowCount = requireNonNullElse(this.rowCount, ServerGridLayout.this.rowCount);
             ServerGridLayout.this.columnCount = requireNonNullElse(this.columnCount, ServerGridLayout.this.columnCount);
             ServerGridLayout.this.position = requireNonNullElse(this.position, ServerGridLayout.this.position);
-            ServerGridLayout.this.range = requireNonNullElse(this.range, ServerGridLayout.this.range);
+            ServerGridLayout.this.range = this.range;
             String nonce = newNonce();
             owner.sendPacket(() -> new ClientboundUpdateGridLayoutPacket(
                     getId(),
